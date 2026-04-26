@@ -1,0 +1,34 @@
+curl -s -F "file=@./media/video/example2.mp4" http://127.0.0.1:8000/analyze -w "\nHTTP_STATUS:%{http_code}\n" -o /tmp/analyze_response.json
+
+cat /tmp/analyze_response.json | jq '.'
+
+curl -s http://127.0.0.1:8000/firestore/analyses/23cc75aa-a101-4935-9e02-f89e1a235292 | jq '.'
+
+
+
+curl -sS -X POST http://127.0.0.1:8000/bitnet/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"text":"You always arrive late and that frustrates me.","from_emotion":"neutral","to_emotion":"angry"}'
+
+
+
+
+sudo docker compose up -d
+
+
+run video
+curl -sS -X POST "http://127.0.0.1:8000/analyze" -F "file=@./media/video/example2.mp4" -o analyze_response.json
+inspect
+jq . analyze_response.json
+
+utterance="I told them I was disappointed, but I still care."
+from="neutral"
+to="upset"
+
+utterance="You are late. We are in a rush."
+from="neutral"
+to="upset"
+
+payload=$(jq -n --arg t "$utterance" --arg f "$from" --arg tt "$to" '{text:$t} + (if $f!="" then {from_emotion:$f} else {} end) + (if $tt!="" then {to_emotion:$tt} else {} end)')
+curl -sS -X POST "http://127.0.0.1:8000/bitnet/analyze" -H "Content-Type: application/json" -d "$payload" -o bitnet_response.json
+jq . bitnet_response.json

@@ -1,0 +1,15 @@
+ultralytics
+transformers
+numpy
+datasets
+Pillow
+torch
+opencv-python
+onnx
+onnxruntime
+fastapi
+sqlalchemy
+alembic
+pydantic
+firebase-admin
+openai>=1.0.0
